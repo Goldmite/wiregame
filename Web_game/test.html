@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html class="dark">
+<head>
+    <title>Wire Mess Game</title>
+    <link  href="styles.css" rel="stylesheet">
+    <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+</head>
+<body class="bg-darkbody text-white-text">
+  
+  
+  <div class="flex flex-wrap justify-center">
+    <!--Game info-->
+    <div class="flex flex-nowrap justify-between w-[1044px] m-2">
+      <div class="card h-[40px] w-[220px] bg-dark-elem1 border-2 border-dotted border-dark-elem2 rounded-lg">
+        <p class="font-mono text-2xl text-center text-dark-text text-outline">Power: 
+          <span id="givenNumber" class="font-bold">?</span> of <span id="maxNumber" class="font-bold">?</span></p>
+      </div>
+      <h1 class="font-mono text-4xl text-outline md:block hidden">Netwire</h1>
+      <div class="h-[40px] md:w-[220px] w-[160px]">
+        <button onclick="toggleModalHow()" id="toggleHow" class="md:block hidden float-right h-full w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full">
+          <p class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</p>
+        </button>
+        <button onClick="toggleModalScore()" id="toggleScore" class="card h-full w-[160px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-lg">
+          <p class="font-mono text-2xl text-center text-dark-text text-outline">Score: <span id="score" class="font-bold text-yellow-300 text-outline">0</span></p>
+        </button>
+      </div>
+    </div>
+    <!--Game Display-->
+    <div id="flexBox" class="flex border-4 border-double rounded-xl bg-darkmiddle w-[1048px] h-[776px] drop-shadow-lg overflow-hidden overflow-x-clip overflow-x-auto hidescroll">
+      <div class="absolute inset-x-0 top-0 h-16 w-[1040px] bg-gradient-to-b from-darker-box to-transparent"></div>
+      <div class="absolute inset-x-0 bottom-0 h-16 w-[1040px] bg-gradient-to-t from-darker-box to-transparent"></div>
+      <svg id="connections" class="absolute w-[1040px] h-[812px] pointer-events-none origin-left" viewBox="0 0 1040 812"></svg> 
+      <div id="circleGrid" class="absolute w-[1040px] h-[768px] grid grid-cols-10 gap-x-20 gap-y-5 p-1 font-mono">
+        <!-- Circles will be generated here -->
+      </div>
+
+      <div id="instructionModal" class="sticky left-0 z-10 bg-dark-elem1 bg-opacity-50 w-full h-full flex items-center justify-center hidden">
+        <div class="bg-darkbody w-5/6 h-[612px] border-2 border-dashed border-dark-elem2 rounded-xl overflow-hidden">
+        <div class="p-5 w-full h-full font-mono overflow-y-auto">
+          <h2 class="text-2xl font-bold mb-4">How To Play</h2>
+          <h3 class="text-xl mb-4">Click node. Connect wires. Get highscore!</h3>
+            
+          <div class="relative pl-3">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-wire1 rounded-lg"></div> 
+            <p class="mt-4 mb-2 text-lg">
+              You get points for:
+            </p>
+          </div>
+          <ul class="list-disc list-inside pl-6 space-y-2 text-md">
+            <li>Matching colored wires. You get bonus points for matching many same-colored wires in a row <span class="italic">(across multiple columns)</span>.</li>
+            <li>Reaching the end <span class="italic"></span>(Get as many nodes in the last column as you can!)</span>.</li>
+          </ul>
+          <div class="relative pl-3">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-wire0 rounded-lg"></div> 
+            <p class="mt-4 mb-2 text-lg">
+              After each click you are given:
+            </p>
+          </div>
+          <ul class="list-disc list-inside pl-6 space-y-2 text-md">
+            <li>A random number <span class="italic">[from 1 to column size]</span>. This number represents how many wires will be connected from the node you click. You will not be given the same number for a column.</li>
+            <li>A random color. This is the color of the wire.</li>
+          </ul>
+          <div class="relative pl-3">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-wire6 rounded-lg"></div> 
+            <p class="mt-4 mb-2 text-lg">
+              Rules:
+            </p>
+          </div>
+          <ol class="list-decimal list-inside pl-6 space-y-2 text-md">
+            <li>Going out of bounds <span class="italic">(above or below the edge)</span> will end your game.</li>
+            <li>Even numbers will always prefer to connect wires away from the centerline <span class="italic">(your selected starting node's horizontal line)</span>.</li>
+            <li>You must finish a column before you are allowed to the next one.</li>
+          </ol>
+          <div class="w-full flex justify-center mt-4">
+            <button onclick="toggleModalHow()" id="okay" class="transition-transform duration-80 hover:scale-90 bg-dark-elem1 px-4 py-2 rounded-lg">
+              <p class="font-mono font-bold text-outline tracking-wider">OKAY</p>
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div id="result" class="sticky left-0 w-full h-full flex items-center justify-center z-10 bg-dark-elem1 bg-opacity-50">
+        <div class="flex flex-wrap justify-center w-[320px] z-11 p-5 bg-gradient-to-b from-dark-elem1 from-10% to-darkbody to-20% border-2 border-solid border-dark-elem2 rounded-xl font-mono font-bold">
+          <h1 class="text-2xl text-outline">Congratulations!</h1>
+          <h2 id="total" class="text-xl text-dark-text text-outline mt-4 mb-4">Score: 0 pts</h2>
+          
+          <div class="relative w-[270px] h-[270px] rounded-full bg-dark-elem1">
+            <div id="donut" class="absolute inset-0 rounded-full"></div>
+            <div class="absolute inset-0 rounded-full bg-darkbody animate_reveal transform scale-[1.01]"></div>
+            <div class="absolute inset-6 rounded-full bg-darkbody flex items-center justify-center"><p class="text-lg text-outline">Finish: +<span id="endBonus">0</span> pts</p></div>
+          </div>
+          
+          <button onClick="toggleModalScore()" class="transition-transform duration-80 hover:scale-90 bg-dark-elem1 px-4 py-2 mt-4 rounded-lg">
+            <p class=" text-outline text-dark-text tracking-wider">CLOSE</p>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class=" md:hidden flex mt-2 h-[40px] w-full justify-center">
+      <button onclick="toggleModalHow()" id="toggleHowMob" class="absolute right-4 h-[40px] w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full">
+        <p class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</p>
+      </button>
+      <h1 class="relative font-mono text-4xl text-outline">Netwire</h1>
+    </div>
+  </div>
+  
+  <script src="nodetest.js"></script>
+  <script>
+    const WireColors = ['250, 115, 20', '250, 200, 20', '130, 200, 20', '5, 120, 85', '65, 55, 200', '160, 30, 175', '190, 20, 60'];
+    const hexWires = ['#FA7314','#FAC814','#82C814','#057855', '#4137C8', '#A01EAF', '#BE143C'];
+    const now = new Date();
+    const datenums = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+
+    const how = document.getElementById('instructionModal');
+    const howClose = document.getElementById('okay');
+    
+    const results = document.getElementById('result');
+    const resultsBtn = document.getElementById('toggleScore');
+
+    const nodeGridElement = document.getElementById("flexBox");
+    let scrollPos = 0;
+    const svg = document.getElementById("connections");
+    const displayNumberElement = document.getElementById("givenNumber");
+    const maxNumberElement = document.getElementById("maxNumber");
+    const scoreDisplay = document.getElementById("score");
+    let gameState = false; //loss
+    let maxPower = 1;
+    let RNGset = 0;
+    let colorIndex = 0;
+    let nextColor = -1;
+    let gameScore = 0;
+    let scoreByColor = [0, 0, 0, 0, 0, 0, 0];
+    let recommendations = [];
+    let counttillnext = 0; //index for rng color
+    const loadGame = async () => {
+      generateCircles();
+      try {
+        //console.log("Loading WebAssembly module...");
+        Module.onRuntimeInitialized = () => 
+        {
+          //console.log("WebAssembly runtime initialized.");
+          //console.log("WebAssembly module loaded successfully.");
+          // Initialize the game graph
+          //console.log("Creating graph...");
+          Module._createGraph();
+          //console.log("Creating start node...");
+          // Setting start nodes to select from
+          colorIndex = chooseRandomColorIndex(0);
+          const startArray = [3, 4, 5, 4, 3];
+          for (let sy = 0; sy < startArray.length; sy++) { //loop y [5-9] 
+            setStartNode(0, sy+(7-Math.floor(startArray.length/2)), startArray[sy]);
+          }
+          document.body.addEventListener("click", EnterValue);
+          //hover effects by given random color
+          nodeGridElement.addEventListener("mouseover", highlightRingOnHover);
+        }
+      } catch (error) {
+          console.error("Error loading the game module:", error);
+      }
+    };
+    function EnterValue(event)  {
+      if (event.target.matches('.circleInput')) {
+        event.target.disabled = true; // Disable the input field
+        node = event.target.closest("#nodeValue");
+        const value = RNGset.pop();
+        const x = parseInt(node.dataset.x);
+        const y = parseInt(node.dataset.y);
+        displayNumberElement.textContent = RNGset.slice(-1);
+        maxNumberElement.textContent = maxPower;
+        try {
+          resetRecommendations(x, y); //remove tints but keep clicked tint
+          Module._addValue(value, x, y); // Add value to the node
+          node.setAttribute('locked', 'false');
+          updateNode(value, node);
+        } catch (err) {
+            console.error("Error calling _addValue:", err);
+        }
+        try {
+          Module._setColor(x, y, colorIndex);
+          updateNextCol(x+1, Module);
+          createConnections(x, y, value, node, WireColors[colorIndex]);
+        
+          countColorScore(x, y, colorIndex);
+          if (gameState || Module._getState()) {
+            resetRecommendations(x, y);
+            updateModal(true);
+          }
+          colorIndex = nextColor; //color for next click
+          recommendMatches(x);
+        } catch (err) {
+            console.error("Error calling color functinos:", err);
+        }
+
+      } 
+    }
+    function highlightRingOnHover(event) {
+      if (event.target.matches('.circleInput')) {
+        const node = event.target.closest("#nodeValue,#startNode");
+        const ringRGB = getComputedStyle(node).backgroundColor.match(/\d+/g);
+        let ringColor = `highlight${ringRGB[0]}`;
+        const originalPlaceHolder = event.target.getAttribute('placeholder');
+        if (event.target.disabled == false) {
+          if (node.id == "nodeValue") { 
+            event.target.setAttribute('placeholder', RNGset.slice(-1));
+          }
+          ringColor = `wire${colorIndex}`;
+        }
+        else if (ringColor == 'highlight64') {
+          node.classList.add('transition-transform', 'duration-150', 'hover:scale-80');
+          node.addEventListener("mouseout", () => {
+            node.classList.remove('transition-transform', 'duration-150', 'hover:scale-80');
+          });
+          return;
+        }
+
+        node.classList.add(`ring-${ringColor}`, 'hover:ring', 'hover:ring-inset');
+        node.addEventListener("mouseout", () => {
+          event.target.setAttribute('placeholder', originalPlaceHolder);
+          node.classList.remove(`ring-${ringColor}`, 'hover:ring', 'hover:ring-inset');
+        });
+      }
+    }
+    function setStartNode(startx, starty, val)
+    {
+      const StartNode = document.querySelector(`[data-x="${startx}"][data-y="${starty}"]#nodeValue`);
+      StartNode.id = "startNode";
+      const inputField = StartNode.querySelector(".circleInput");
+      inputField.disabled = false;
+      StartNode.setAttribute('locked', 'false');
+      inputField.setAttribute('placeholder', '?');
+      updateNode(0, StartNode);
+
+      StartNode.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const nodes = document.querySelectorAll("#startNode");
+        nodes.forEach(start => {
+          const startInput = start.querySelector(".circleInput");
+          startInput.disabled = true;
+          if (start != StartNode) {
+            start.setAttribute('start', 'false');
+          }
+        });
+        Module._addValue(val, startx, starty);
+        updateNode(val, StartNode);
+        Module._setColor(startx, starty, colorIndex);
+        nextColor = chooseRandomColorIndex(startx);
+        updateNextCol(startx+1, Module);
+        createConnections(startx, starty, val, StartNode, WireColors[colorIndex]);
+        colorIndex = nextColor;
+      });
+    }
+    function recommendMatches(col) 
+    {
+      const px = col - 1;
+      const parentColumn = nodeGridElement.querySelectorAll(`.circle[data-x="${px}"]`);
+      parentColumn.forEach(parent => { 
+        const py = parent.getAttribute("data-y");
+        const parentColor = Module._getColor(px, py);
+        if (parentColor == nextColor) {
+          let childcount = 0;
+          const pInput = parent.querySelector('.circleInput');
+          if (pInput != null) childcount = pInput.value;
+          for (let n = 0; n < childcount; n++) {
+            const row = Module._getYofnthChild(px, py, n);
+            const childNode = nodeGridElement.querySelector(`[data-x="${col}"][data-y="${row}"]#nodeValue:not([locked])`);
+            if (childNode != null) {
+              const tint = document.createElement('div');
+              tint.classList.add('circle','inset-0','saturate-50');
+              tint.setAttribute("tint", "true");
+              tint.setAttribute('data-x', col);
+              tint.setAttribute('data-y', row);
+              tint.style.backgroundColor = `rgba(${WireColors[nextColor]},0.33)`;
+              childNode.appendChild(tint);
+              recommendations.push(tint); //add elements to reset background after click
+            }
+          }
+        }
+      });
+    }
+    function resetRecommendations(idx, idy)
+    {
+      while (recommendations.length != 0) {
+        const old = recommendations.pop();
+        if (idx != old.getAttribute("data-x") || idy != old.getAttribute("data-y")) old.remove();
+      }
+    }
+    function countColorScore(x, y, cIndex)
+    {
+      const n = Module._getNumberofParents(x, y);
+      const px = x - 1;
+      let MAXcolorStreak = 1;
+      for (let p = 0; p < n; p++) {
+        const py = Module._getYofnthParent(x, y, p);
+        const pcolor = Module._getColor(px, py);
+        if (cIndex == pcolor) {
+          const streak = Module._updateColorStreak(px, py, x, y);
+          if (streak > MAXcolorStreak) { 
+            MAXcolorStreak = streak; 
+          }
+          gameScore += 1; //always give point for matching
+          scoreByColor[cIndex] += 1; //collect for results by color
+        }
+      }
+      //only count streaking once, it is based on length of continuation not number of parents streak
+      gameScore += MAXcolorStreak - 1; //do not double count single connections
+      scoreByColor[cIndex] += MAXcolorStreak - 1; //mirror for results
+      scoreDisplay.textContent = gameScore; 
+    }
+    function createConnections(x, y, value, node, color)
+    {
+      const connections = [];
+      const childX = x + 1; //always true
+      try {
+        for (let n = 0; n < value; n++) {
+          const childY = Module._getYofnthChild(x, y, n);
+          const childNode = document.getElementById('circleGrid').querySelector(`.circle[data-x="${childX}"][data-y="${childY}"]`);
+          if (childNode != null) connections.push(childNode);
+        }
+      } catch (err) {
+        console.error("Error calling _getYofnthChild: ", err);
+      }
+      try {
+        drawConnections(node, connections, color, value);
+      } catch (err) {
+        console.error("Error calling local drawConnections(): ", err);
+      }
+    }
+    function getSeed(col) {
+      return datenums + col * 12357;
+    }
+    function seededRandomly(seed) {
+      let x = Math.sin(seed) * 10000;
+      return x - Math.floor(x); // (0-1)
+    }
+    function chooseRandomColorIndex(col)
+    {
+      counttillnext++;
+      const indexing = Math.floor(seededRandomly(getSeed(col * counttillnext)) * WireColors.length);
+      nodeGridElement.style.borderColor = hexWires[indexing];
+      displayNumberElement.style.color = `rgb(${WireColors[indexing]})`;
+      howClose.style.backgroundColor = hexWires[indexing];
+      return indexing;
+    }
+    function rngSetByRange(col, end)
+    {
+      const range = Array.from({ length: 15}, (_, i) => i + 1); //[1-15]
+      // Shuffle the array using Fisher-Yates algorithm
+      let randomSeed = getSeed(col); //save seed for today's date
+      for (let i = range.length - 1; i > 0; i--) {
+        randomSeed = seededRandomly(randomSeed) * 10000;
+        const j = Math.floor(seededRandomly(randomSeed) * (i + 1)); //Random index
+        [range[i], range[j]] = [range[j], range[i]];  //swap
+      }
+      //reduce array to numbers in range [1, end]
+      let filtered = []; 
+      for (let i = 0; i < range.length; i++) {
+        if (range[i] <= end) {
+          filtered.push(range[i]);
+        }
+      }
+      displayNumberElement.textContent = filtered.slice(-1);
+      maxNumberElement.textContent = maxPower;
+      //console.log("Generated random set");
+      return filtered;
+    }
+    function updateNode(updated_value, element) 
+    {
+      element.classList.remove('hideNode');
+      input = element.querySelector(".circleInput");
+      if (!element.hasAttribute("locked")) input.disabled = false;
+      
+      if (updated_value != 0) {
+        input.value = updated_value;
+      }
+    }
+    function updateNextCol(col, Module)
+    {
+      const column = document.querySelectorAll(`[data-x="${col}"]#nodeValue`);
+      const colX = column[0].getBoundingClientRect().left - window.innerWidth / 2;
+      const nextColReady = Module._isParentColFilled(col - 1);
+      column.forEach(element => {
+        const row = element.getAttribute("data-y");
+        if (Module._ChildHaveParent(col, row)) {
+          if (nextColReady) { 
+            element.removeAttribute('locked');
+          }
+          else {
+            element.setAttribute('locked', 'true');
+          }
+          updateNode(0, element);
+        }
+      });
+      if (nextColReady){
+        counttillnext = col * 15; //reset color rng fairly
+        nodeGridElement.scrollTo({ left: colX, behavior: "smooth" });
+        maxPower = Module._sizeOfCol(col);
+        if (col == 9) {
+          gameState = true;
+          gameScore += maxPower;
+          return;
+        }
+        RNGset = rngSetByRange(col, maxPower);
+        nextColor = chooseRandomColorIndex(col - 1);
+        resetRecommendations(null, null);
+        recommendMatches(col);
+      } else {
+        nextColor = chooseRandomColorIndex(col - 1);
+      }
+    }
+    function generateCircles() {
+        const gridContainer = document.getElementById('circleGrid');
+        
+        for (let y = 0; y <= 14; y++) {
+          for (let x = 0; x < 10; x++) {
+            const circle = document.createElement('div');
+            circle.classList.add('circle', 'hideNode');
+            circle.setAttribute('id', 'nodeValue');
+            circle.setAttribute('data-x', x);
+            circle.setAttribute('data-y', y);
+            // Create the input field inside the circle
+            const input = document.createElement('input');
+            input.classList.add('circleInput');
+            input.setAttribute('autocomplete', 'off');
+            input.setAttribute('placeholder', '0');
+            input.disabled = true;
+            circle.appendChild(input);
+            // Append the circle to the grid container
+            gridContainer.appendChild(circle);
+          }
+        }
+    }
+    // Connect parent to child nodes (SVG line creation)
+    async function drawConnections(parentNode, childNodes, color, offsetByValue) {
+      const borderOffset = parseFloat(getComputedStyle(nodeGridElement).getPropertyValue('border-top-width'));
+      const offsetLeft = nodeGridElement.getBoundingClientRect().left - scrollPos;
+      const offsetTop = nodeGridElement.getBoundingClientRect().top + borderOffset;
+      const parentRect = parentNode.getBoundingClientRect();
+      const parentCenterX = parentRect.left + parentRect.width / 2 - offsetLeft;
+      const parentCenterY = parentRect.top + parentRect.height / 2 - offsetTop;
+      
+       const childrenLeft = childNodes[0].getBoundingClientRect().left;
+       for (const childNode of childNodes) {
+        const childRect = childNode.getBoundingClientRect();
+        const childCenterX = childrenLeft + childRect.width / 2 - offsetLeft;
+        const childCenterY = childRect.top + childRect.height / 2 - offsetTop;
+        const diffX = (childCenterX - parentCenterX) / 1.19;
+        const diffY = (childCenterY - parentCenterY) / 1.23;
+        // Create an SVG path for the connection
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.classList.add('animate_draw');
+        path.setAttribute('d', `M${parentCenterX} ${parentCenterY} C${parentCenterX+diffX-offsetByValue} ${childCenterY-diffY}, ${childCenterX-diffX-offsetByValue} ${parentCenterY+diffY}, ${childCenterX} ${childCenterY}`);
+        path.setAttribute('stroke', `rgb(${color})`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-width', '2');
+        svg.appendChild(path);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    
+    function updateModal(flag) {
+      if (flag) {
+        const total = document.getElementById("total");
+        total.textContent = `Score: ${gameScore} pts`;
+        let totalNoFinish = gameScore;
+        if (gameState) { //if finished last column, dont count extra points for color bar percentage
+          totalNoFinish -= maxPower;
+        }
+        let slice = [0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < WireColors.length; i++)
+        {
+          slice[i] = (scoreByColor[i] / totalNoFinish) * 100;
+          if (i > 0) { 
+            slice[i] += slice[i-1];
+          }
+        }
+        const donutBar = document.getElementById("donut");
+        const pie = `conic-gradient(${hexWires[0]} 0% ${slice[0]}%,${hexWires[1]} ${slice[0]}% ${slice[1]}%,${hexWires[2]} ${slice[1]}% ${slice[2]}%,${hexWires[3]} ${slice[2]}% ${slice[3]}%,${hexWires[4]} ${slice[3]}% ${slice[4]}%,${hexWires[5]} ${slice[4]}% ${slice[5]}%,${hexWires[6]} ${slice[5]}% ${slice[6]}%)`;
+        donutBar.style.background = pie;
+        const endPts = document.getElementById("endBonus");
+        endPts.textContent = gameScore - totalNoFinish;
+        
+        resultsBtn.disabled = false;
+        toggleModalScore();
+
+        document.body.removeEventListener("click", EnterValue);
+        allInputNodes = nodeGridElement.querySelectorAll("#nodeValue:not([locked]):not(.hideNode)");
+        allInputNodes.forEach(node => {
+          node.setAttribute('locked', 'true');
+          node.querySelector(".circleInput").disabled = true; 
+        });
+      }
+    }
+    function toggleModalScore() {
+      if (results.classList.contains('hidden')) {
+        if (!how.classList.contains('hidden')) {
+          toggleModalHow();
+        }
+        nodeGridElement.classList.remove("overflow-x-scroll");
+        results.classList.remove('hidden');
+        resultsBtn.classList.add("border-highlight212");
+      } else {
+        nodeGridElement.classList.add("overflow-x-scroll");
+        results.classList.add('hidden');
+        resultsBtn.classList.remove("border-highlight212");
+      }
+    }
+    toggleModalScore();
+    resultsBtn.disabled = true;
+    function toggleModalHow() {
+      let howBtn = document.getElementById('toggleHow');
+      if (window.getComputedStyle(howBtn).display === 'none') {
+        howBtn = document.getElementById('toggleHowMob');
+      }
+      if (how.classList.contains('hidden')) {
+        if (!results.classList.contains('hidden')) {
+          toggleModalScore();
+        }
+        nodeGridElement.classList.remove("overflow-x-scroll");
+        how.classList.remove('hidden');
+        howBtn.classList.add("border-highlight212");
+      } else {
+        nodeGridElement.classList.add("overflow-x-scroll");
+        how.classList.add('hidden');
+        howBtn.classList.remove("border-highlight212");
+      }
+    }
+    toggleModalHow();
+
+    nodeGridElement.addEventListener('scroll', () => {
+      scrollPos = nodeGridElement.scrollLeft;
+    });
+    window.onload = loadGame;
+</script>
+</body>
+</html>
