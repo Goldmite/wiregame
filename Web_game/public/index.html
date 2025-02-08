@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html class="dark">
+<html lang="en" class="dark">
 <head>
     <title>Netwire</title>
     <link  href="styles.css" rel="stylesheet">
     <link rel="icon" href="data:,">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    
 </head>
 <body class="bg-darkbody text-white-text">
-  
-  
   <div class="flex flex-wrap justify-center">
     <!--Game info-->
     <div class="flex flex-nowrap justify-between w-[1044px] m-2">
@@ -22,10 +18,10 @@
       <h1 class="font-mono text-4xl text-outline md:block hidden">Netwire</h1>
       <div class="h-[40px] md:w-[220px] w-[160px]">
         <button onclick="toggleModalHow()" id="toggleHow" class="md:block hidden float-right h-full w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full">
-          <p class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</p>
+          <span class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</span>
         </button>
         <button onClick="toggleModalScore()" id="toggleScore" class="card h-full w-[160px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-lg">
-          <p class="font-mono text-2xl text-center text-dark-text text-outline">Score: <span id="score" class="font-bold text-yellow-300 text-outline">0</span></p>
+          <span class="font-mono text-2xl text-center text-dark-text text-outline">Score: <span id="score" class="font-bold text-yellow-300 text-outline">0</span></span>
         </button>
       </div>
     </div>
@@ -52,7 +48,7 @@
           </div>
           <ul class="list-disc list-inside pl-6 space-y-2 text-md">
             <li>Matching colored wires. You get bonus points for matching many same-colored wires in a row <span class="italic">(across multiple columns)</span>.</li>
-            <li>Reaching the end <span class="italic"></span>(Get as many nodes in the last column as you can!)</span>.</li>
+            <li>Reaching the end <span class="italic">(Get as many nodes in the last column as you can!)</span>.</li>
           </ul>
           <div class="relative pl-3">
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-wire0 rounded-lg"></div> 
@@ -77,14 +73,14 @@
           </ol>
           <div class="w-full flex justify-center mt-4">
             <button onclick="toggleModalHow()" id="okay" class="transition-transform duration-80 hover:scale-90 bg-dark-elem1 px-4 py-2 rounded-lg">
-              <p class="font-mono font-bold text-outline tracking-wider">OKAY</p>
+              <span class="font-mono font-bold text-outline tracking-wider">OKAY</span>
             </button>
           </div>
         </div>
       </div>
       </div>
 
-      <div id="result" class="sticky left-0 w-full h-full flex items-center justify-center z-10 bg-dark-elem1 bg-opacity-50">
+      <div id="result" class="sticky left-0 w-full h-full flex items-center justify-center z-10 bg-dark-elem1 bg-opacity-50 hidden">
         <div class="flex flex-wrap justify-center w-[320px] z-11 p-5 bg-gradient-to-b from-dark-elem1 from-10% to-darkbody to-20% border-2 border-solid border-dark-elem2 rounded-xl font-mono font-bold">
           <h1 class="text-2xl text-outline">Congratulations!</h1>
           <h2 id="total" class="text-xl text-dark-text text-outline mt-4 mb-4">Score: 0 pts</h2>
@@ -101,14 +97,14 @@
             <p id="colorname" class="text-outline flex-1 text-left"></p>
           </div>
           <button onClick="toggleModalScore()" class="transition-transform duration-80 hover:scale-90 bg-dark-elem1 px-4 py-2 mt-4 rounded-lg">
-            <p class=" text-outline text-dark-text tracking-wider">CLOSE</p>
+            <span class=" text-outline text-dark-text tracking-wider">CLOSE</span>
           </button>
         </div>
       </div>
     </div>
     <div class=" md:hidden flex mt-2 h-[40px] w-full justify-center">
       <button onclick="toggleModalHow()" id="toggleHowMob" class="absolute right-4 h-[40px] w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full">
-        <p class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</p>
+        <span class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</span>
       </button>
       <h1 class="relative font-mono text-4xl text-outline">Netwire</h1>
     </div>
