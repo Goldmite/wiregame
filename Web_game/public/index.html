@@ -11,17 +11,17 @@
   <div class="flex flex-wrap justify-center">
     <!--Game info-->
     <div class="flex flex-nowrap justify-between w-[1044px] m-2">
-      <div class="card h-[40px] w-[220px] bg-dark-elem1 border-2 border-dotted border-dark-elem2 rounded-lg">
+      <div class="h-[40px] w-[220px] bg-dark-elem1 border-2 border-dotted border-dark-elem2 rounded-lg">
         <p class="font-mono text-2xl text-center text-dark-text text-outline tracking-tighter text-nowrap">Power: 
           <span id="givenNumber" class="font-bold">?</span> of <span id="maxNumber" class="font-bold">?</span></p>
       </div>
       <h1 class="font-mono text-4xl text-outline md:block hidden">Netwire</h1>
-      <div class="h-[40px] md:w-[220px] w-[160px]">
-        <button onclick="toggleModalHow()" id="toggleHow" class="md:block hidden float-right h-full w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full">
-          <span class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</span>
-        </button>
-        <button onClick="toggleModalScore()" id="toggleScore" class="card h-full w-[160px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-lg">
+      <div class="flex justify-between h-[40px] md:w-[220px] w-[160px]">
+        <button onClick="toggleModalScore()" id="toggleScore" class="h-full w-[160px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-lg">
           <span class="font-mono text-2xl text-center text-dark-text text-outline">Score: <span id="score" class="font-bold text-yellow-300 text-outline">0</span></span>
+        </button>
+        <button onclick="toggleModalHow()" id="toggleHow" class="md:block hidden h-full w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full
+          font-mono font-bold text-2xl text-center hover:text-3xl text-outline">?
         </button>
       </div>
     </div>
@@ -83,7 +83,7 @@
       <div id="result" class="sticky left-0 w-full h-full flex items-center justify-center z-10 bg-dark-elem1 bg-opacity-50 hidden">
         <div class="flex flex-wrap justify-center w-[320px] z-11 p-5 bg-gradient-to-b from-dark-elem1 from-10% to-darkbody to-20% border-2 border-solid border-dark-elem2 rounded-xl font-mono font-bold">
           <h1 class="text-2xl text-outline">Congratulations!</h1>
-          <h2 id="total" class="text-xl text-dark-text text-outline mt-4 mb-4">Score: 0 pts</h2>
+          <h2 class="text-xl text-dark-text text-outline mt-4 mb-4">Score: <span id="total" class="text-white-text">0</span> pts</h2>
           
           <div class="relative w-[275px] h-[275px] rounded-full bg-dark-elem1">
             <div id="donut" class="absolute inset-0 rounded-full"></div>
@@ -97,14 +97,14 @@
             <p id="colorname" class="text-outline flex-1 text-left"></p>
           </div>
           <button onClick="toggleModalScore()" class="transition-transform duration-80 hover:scale-90 bg-dark-elem1 px-4 py-2 mt-4 rounded-lg">
-            <span class=" text-outline text-dark-text tracking-wider">CLOSE</span>
+            <span class="text-outline text-dark-text tracking-wider">CLOSE</span>
           </button>
         </div>
       </div>
     </div>
     <div class=" md:hidden flex mt-2 h-[40px] w-full justify-center">
-      <button onclick="toggleModalHow()" id="toggleHowMob" class="absolute right-4 h-[40px] w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full">
-        <span class="font-mono font-bold text-2xl text-center transition-transform duration-100 hover:scale-125 text-outline">?</span>
+      <button onclick="toggleModalHow()" id="toggleHowMob" class="absolute right-4 h-[40px] w-[40px] bg-dark-elem1 border-2 border-solid border-dark-elem2 rounded-full
+          font-mono font-bold text-2xl text-center hover:text-3xl text-outline">?
       </button>
       <h1 class="relative font-mono text-4xl text-outline">Netwire</h1>
     </div>
@@ -538,7 +538,7 @@
     function updateModal(flag) {
       if (flag) {
         const total = document.getElementById("total");
-        total.textContent = `Score: ${gameScore} pts`;
+        total.textContent = `${gameScore}`;
         let totalNoFinish = gameScore;
         if (gameState) { //if finished last column, dont count extra points for color bar percentage
           totalNoFinish -= maxPower;
@@ -594,7 +594,6 @@
         resultsBtn.classList.remove("border-highlight212");
       }
     }
-    toggleModalScore();
     resultsBtn.disabled = true;
     function toggleModalHow() {
       let howBtn = document.getElementById('toggleHow');
