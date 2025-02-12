@@ -612,10 +612,6 @@ video {
   position: relative;
 }
 
-.sticky {
-  position: sticky;
-}
-
 .inset-0 {
   inset: 0px;
 }
@@ -649,8 +645,8 @@ video {
   z-index: 10;
 }
 
-.float-right {
-  float: right;
+.m-1 {
+  margin: 0.25rem;
 }
 
 .m-2 {
@@ -702,10 +698,6 @@ video {
   height: 4rem;
 }
 
-.h-\[270px\] {
-  height: 270px;
-}
-
 .h-\[275px\] {
   height: 275px;
 }
@@ -718,6 +710,14 @@ video {
   height: 612px;
 }
 
+.h-\[656px\] {
+  height: 656px;
+}
+
+.h-\[664px\] {
+  height: 664px;
+}
+
 .h-\[768px\] {
   height: 768px;
 }
@@ -726,12 +726,12 @@ video {
   height: 776px;
 }
 
-.h-\[812px\] {
-  height: 812px;
-}
-
 .h-full {
   height: 100%;
+}
+
+.h-lvh {
+  height: 100lvh;
 }
 
 .w-1 {
@@ -762,10 +762,6 @@ video {
   width: 220px;
 }
 
-.w-\[270px\] {
-  width: 270px;
-}
-
 .w-\[275px\] {
   width: 275px;
 }
@@ -780,6 +776,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.max-w-full {
+  max-width: 100%;
 }
 
 .flex-1 {
@@ -849,6 +849,10 @@ video {
        column-gap: 5rem;
 }
 
+.gap-y-3 {
+  row-gap: 0.75rem;
+}
+
 .gap-y-5 {
   row-gap: 1.25rem;
 }
@@ -863,16 +867,12 @@ video {
   overflow: hidden;
 }
 
-.overflow-x-auto {
-  overflow-x: auto;
-}
-
 .overflow-y-auto {
   overflow-y: auto;
 }
 
-.overflow-x-clip {
-  overflow-x: clip;
+.overflow-y-hidden {
+  overflow-y: hidden;
 }
 
 .overflow-x-scroll {
@@ -1233,17 +1233,27 @@ video {
   transition-duration: 150ms;
 }
 
-.duration-100 {
-  transition-duration: 100ms;
-}
-
 .duration-150 {
   transition-duration: 150ms;
+}
+
+.will-change-scroll {
+  will-change: scroll-position;
 }
 
 #toggleHow, #toggleScore {
   pointer-events: auto;
   z-index: 5;
+}
+
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+.overflow-x-scroll {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .circle {
@@ -1431,12 +1441,6 @@ video {
   animation: disappear 1234ms linear forwards;
 }
 
-.hover\:scale-125:hover {
-  --tw-scale-x: 1.25;
-  --tw-scale-y: 1.25;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
 .hover\:scale-80:hover {
   --tw-scale-x: 0.8;
   --tw-scale-y: 0.8;
@@ -1462,6 +1466,24 @@ video {
 
 .hover\:ring-inset:hover {
   --tw-ring-inset: inset;
+}
+
+@media (min-width: 640px) {
+  .sm\:m-2 {
+    margin: 0.5rem;
+  }
+
+  .sm\:h-\[768px\] {
+    height: 768px;
+  }
+
+  .sm\:h-\[776px\] {
+    height: 776px;
+  }
+
+  .sm\:gap-y-5 {
+    row-gap: 1.25rem;
+  }
 }
 
 @media (min-width: 768px) {
