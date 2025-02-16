@@ -43,7 +43,7 @@
         <div class="bg-darkbody w-5/6 h-[612px] border-2 border-dashed border-dark-elem2 rounded-xl overflow-hidden">
         <div class="p-5 w-full h-full font-mono overflow-y-auto">
           <h2 class="text-2xl font-bold mb-4">How To Play</h2>
-          <h3 class="text-xl mb-4">Click node. Connect wires. Get highscore!</h3>
+          <h3 class="text-xl mb-4">Click nodes. Connect wires. Get highscore!</h3>
             
           <div class="relative pl-3">
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-wire1 rounded-lg"></div> 
@@ -62,8 +62,8 @@
             </p>
           </div>
           <ul class="list-disc list-inside pl-6 space-y-2 text-md">
-            <li>A random number <span class="italic">[from 1 to column size]</span>. This number represents how many wires will be connected from the node you click. You will not be given the same number for a column.</li>
-            <li>A random color. This is the color of the wire.</li>
+            <li>A random number <span class="italic">[POWER from 1 to column size]</span>. POWER represents how many wires will be connected from the node you click. You will not be given the same POWER for a column.</li>
+            <li>A random color. This is the color of the wire. Represented as border and POWER color.</li>
           </ul>
           <div class="relative pl-3">
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-wire6 rounded-lg"></div> 
@@ -73,8 +73,9 @@
           </div>
           <ol class="list-decimal list-inside pl-6 space-y-2 text-md">
             <li>Going out of bounds <span class="italic">(above or below the edge)</span> will end your game.</li>
-            <li>Even numbers will always prefer to connect wires away from the centerline <span class="italic">(your selected starting node's horizontal line)</span>.</li>
-            <li>You must finish a column before you are allowed to the next one.</li>
+            <li>Even numbers will always prefer to connect wires away from the centerline.</li>
+            <li>You must finish a column before you unlock the next one.</li>
+            <li>Once per column, matching >80% of the active nodes will make the next POWER be 0.</li>
           </ol>
           <div class="w-full flex justify-center mt-4">
             <button onclick="toggleModalHow()" id="okay" class="transition-transform duration-80 hover:scale-90 bg-dark-elem1 px-4 py-2 rounded-lg">
@@ -145,6 +146,7 @@
     let scoreByColor = [0, 0, 0, 0, 0, 0, 0];
     let recommendations = [];
     let counttillnext = 0; //index for rng color
+    let chargedCol = 0; //if reaches value 80% of column size then give 0
     const loadGame = async () => {
       generateCircles();
       try {
@@ -179,8 +181,6 @@
         const value = RNGset.pop();
         const x = parseInt(node.dataset.x);
         const y = parseInt(node.dataset.y);
-        displayNumberElement.textContent = RNGset.slice(-1);
-        maxNumberElement.textContent = maxPower;
         try {
           resetRecommendations(x, y); //remove tints but keep clicked tint
           Module._addValue(value, x, y); // Add value to the node
@@ -192,9 +192,19 @@
         try {
           Module._setColor(x, y, colorIndex);
           updateNextCol(x+1, Module);
-          createConnections(x, y, value, node, WireColors[colorIndex]);
-        
+          if (value > 0) {
+            createConnections(x, y, value, node, WireColors[colorIndex]);
+          }
           countColorScore(x, y, colorIndex);
+          if (Module._isParentColFilled(x)) { chargedCol = 0; } //reset on next column
+          if (chargedCol >= maxPower * 0.80) { //if 80% of the column's nodes are matched, then next number given will be 0.
+            RNGset.pop()
+            RNGset.push(0);
+            chargedCol = 0; //reset, only applies once per column
+          }
+          //update Power display
+          displayNumberElement.textContent = RNGset.slice(-1);
+          maxNumberElement.textContent = maxPower;
           if (gameState || Module._getState()) {
             resetRecommendations(x, y);
             updateModal(true);
@@ -300,6 +310,7 @@
     }
     function countColorScore(x, y, cIndex)
     {
+      let matchedBool = 0;
       const n = Module._getNumberofParents(x, y);
       const px = x - 1;
       let MAXcolorStreak = 1;
@@ -307,6 +318,7 @@
         const py = Module._getYofnthParent(x, y, p);
         const pcolor = Module._getColor(px, py);
         if (cIndex == pcolor) {
+          matchedBool = 1;
           const streak = Module._updateColorStreak(px, py, x, y);
           if (streak > MAXcolorStreak) { 
             MAXcolorStreak = streak; 
@@ -319,6 +331,7 @@
       gameScore += MAXcolorStreak - 1; //do not double count single connections
       scoreByColor[cIndex] += MAXcolorStreak - 1; //mirror for results
       scoreDisplay.textContent = gameScore; 
+      chargedCol += matchedBool;
     }
     function createConnections(x, y, value, node, color)
     {
@@ -502,44 +515,66 @@
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     }
-    function NameYourColor(r, g, b) {
-      let categories = [
-        { name: "Stinky Black", rgb: [0, 0, 0] },
-        { name: "Midnight Navy", rgb: [30, 30, 90] },
-        { name: "Shadow Gray", rgb: [60, 60, 60] },
-        { name: "Indigo Night", rgb: [80, 40, 160] },
-        { name: "Muted Ash", rgb: [120, 120, 120] },
-        { name: "Deep Blue", rgb: [65, 55, 200] },
-        { name: "Teal Ocean", rgb: [5, 120, 85] },
-        { name: "Steel Blue", rgb: [40, 90, 160] },
-        { name: "Forest Green", rgb: [50, 140, 50] },
-        { name: "Cool Cyan", rgb: [50, 200, 180] },
-        { name: "Golden Olive", rgb: [160, 150, 40] },
-        { name: "Olive Green", rgb: [110, 180, 40] },
-        { name: "Lime Burst", rgb: [130, 200, 20] },
-        { name: "Electric Lime", rgb: [180, 255, 60] },
-        { name: "Sunset Glow", rgb: [250, 150, 50] },
-        { name: "Golden Sun", rgb: [250, 200, 20] },
-        { name: "Warm Brown", rgb: [140, 80, 50] },
-        { name: "Burnt Sienna", rgb: [160, 70, 30] },
-        { name: "Amber Fire", rgb: [220, 90, 40] },
-        { name: "Fiery Orange", rgb: [250, 115, 20] },
-        { name: "Dusty Rose", rgb: [180, 100, 120] },
-        { name: "Warm Coral", rgb: [230, 100, 80] },
-        { name: "Crimson Flame", rgb: [190, 20, 60] },
-        { name: "Deep Burgundy", rgb: [110, 30, 60] },
-        { name: "Royal Magenta", rgb: [180, 50, 160] },
-        { name: "Violet Blast", rgb: [160, 30, 175] },
-        { name: "Mystic Violet", rgb: [190, 140, 210] },
-        { name: "Bright Neon", rgb: [200, 255, 50] }
+    function RGBtoHSL(r, g, b) {
+      r /= 255;
+      g /= 255;
+      b /= 255;
+      // Find greatest and smallest channel values
+      let cmin = Math.min(r,g,b),
+          cmax = Math.max(r,g,b);
+      let delta = cmax - cmin,
+          h = 0, l = 0; //s = 0,
+      if (delta == 0) // No difference
+        h = 0;
+      else if (cmax == r) // Red is max
+        h = ((g - b) / delta) % 6;
+      else if (cmax == g) // Green is max
+        h = (b - r) / delta + 2;
+      else // Blue is max
+        h = (r - g) / delta + 4;
+      h = Math.round(h * 60);  
+      if (h < 0) // Make negative hues positive behind 360
+          h += 360;
+  
+      l = (cmax + cmin) / 2; // Calculate lightness
+      s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1)); // Calculate saturation
+      s = +(s * 100).toFixed(1);
+      l = +(l * 100).toFixed(1);
+      return [h, s, l];
+    }
+    function NameYourColor(h, s, l) {
+      let channels = [ 
+        { name: ["Tasty Orange", "Pumpkin Spice", "Burnt Ember"], hue: 22, light: 53 },
+        { name: ["Golden Lemon", "Honey Gold", "Dull Sand"], hue: 46, light: 53 },
+        { name: ["Electric Lime", "Leaf Green", "Olive Drab"], hue: 85, light: 43 },
+        { name: ["Mint Grove", "Retro Jade", "Evening Pine"], hue: 120, light: 33 },
+        { name: ["Neon Teal", "Seafoam Green", "Jungle Jade"], hue: 160, light: 36 },
+        { name: ["Ice Tea Sky", "Steal Teal", "Nordic Fjord"], hue: 200, light: 37 },
+        { name: ["Bright Azure", "Royal Blue", "Midnight Navy"], hue: 243, light: 50 },
+        { name: ["Mystic Violet", "Plum Purple", "Deep Amethyst"], hue: 293, light: 40 },
+        { name: ["Fiery Ruby", "Cherry Red", "Deep Crimson"], hue: 348, light: 41 },
       ];
-      function colorDistance(c1, c2) {
-        return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2) + Math.pow(c1[2] - c2[2], 2));
+      
+      let minDelta = 360;
+      let mainChannel = 0;
+      for (let ci = 0; ci < channels.length; ci++) {
+        const hdiff = Math.abs(channels[ci].hue - h);
+        if (hdiff < minDelta) {
+          minDelta = hdiff;
+          mainChannel = ci;
+        }
       }
-      let closestCategory = categories.reduce((prev, curr) => {
-        return (colorDistance([r, g, b], curr.rgb) < colorDistance([r, g, b], prev.rgb)) ? curr : prev;
-      });
-      return closestCategory.name;
+
+      const chosen = channels[mainChannel];
+      let lightLevel = 1; //Medium
+      if (l > chosen.light * 1.33 ) {
+        lightLevel = 0; //Bright
+      }
+      else if (l <= chosen.light * 0.66) {
+        lightLevel = 2; //Dark
+      }
+
+      return chosen.name[lightLevel];
     }
 
     function updateModal(flag) {
@@ -551,7 +586,7 @@
           totalNoFinish -= maxPower;
         }
         let slice = [0, 0, 0, 0, 0, 0, 0];
-        let [avgR, avgG, avgB] = [0, 0, 0];
+        let [avgH, avgS, avgL] = [0, 0, 0];
         for (let i = 0; i < WireColors.length; i++)
         {
           const colFraction = scoreByColor[i] / totalNoFinish;
@@ -559,11 +594,11 @@
           if (i > 0) { 
             slice[i] += slice[i-1];
           }
-          
           const [r, g, b] = WireColors[i].split(", ").map(Number);
-          avgR += r * colFraction;
-          avgG += g * colFraction;
-          avgB += b * colFraction;
+          const [h, s, l] = RGBtoHSL(r, g, b);
+          avgH += h * colFraction;
+          avgS += s * colFraction;
+          avgL += l * colFraction;
         }
         const donutBar = document.getElementById("donut");
         const pie = `conic-gradient(${hexWires[0]} 0% ${slice[0]}%,${hexWires[1]} ${slice[0]}% ${slice[1]}%,${hexWires[2]} ${slice[1]}% ${slice[2]}%,${hexWires[3]} ${slice[2]}% ${slice[3]}%,${hexWires[4]} ${slice[3]}% ${slice[4]}%,${hexWires[5]} ${slice[4]}% ${slice[5]}%,${hexWires[6]} ${slice[5]}% ${slice[6]}%)`;
@@ -571,10 +606,10 @@
         const endPts = document.getElementById("endBonus");
         endPts.textContent = gameScore - totalNoFinish;
         
-        const weightedColor = `rgb(${avgR}, ${avgG}, ${avgB})`;
+        const weightedColor = `hsl(${avgH}, ${avgS}%, ${avgL}%)`;
         document.getElementById('yourcolor').style.background = weightedColor;
         const colNameText = document.getElementById('colorname');
-        colNameText.textContent = NameYourColor(avgR, avgG, avgB);
+        colNameText.textContent = NameYourColor(avgH, avgS, avgL);
         colNameText.style.color = weightedColor;
         resultsBtn.disabled = false;
         toggleModalScore();
