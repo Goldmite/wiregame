@@ -586,7 +586,7 @@
           totalNoFinish -= maxPower;
         }
         let slice = [0, 0, 0, 0, 0, 0, 0];
-        let [avgH, avgS, avgL] = [0, 0, 0];
+        let [avgR, avgG, avgB] = [0, 0, 0];
         for (let i = 0; i < WireColors.length; i++)
         {
           const colFraction = scoreByColor[i] / totalNoFinish;
@@ -595,21 +595,21 @@
             slice[i] += slice[i-1];
           }
           const [r, g, b] = WireColors[i].split(", ").map(Number);
-          const [h, s, l] = RGBtoHSL(r, g, b);
-          avgH += h * colFraction;
-          avgS += s * colFraction;
-          avgL += l * colFraction;
+          avgR += r * colFraction;
+          avgG += g * colFraction;
+          avgB += b * colFraction;
         }
         const donutBar = document.getElementById("donut");
         const pie = `conic-gradient(${hexWires[0]} 0% ${slice[0]}%,${hexWires[1]} ${slice[0]}% ${slice[1]}%,${hexWires[2]} ${slice[1]}% ${slice[2]}%,${hexWires[3]} ${slice[2]}% ${slice[3]}%,${hexWires[4]} ${slice[3]}% ${slice[4]}%,${hexWires[5]} ${slice[4]}% ${slice[5]}%,${hexWires[6]} ${slice[5]}% ${slice[6]}%)`;
         donutBar.style.background = pie;
         const endPts = document.getElementById("endBonus");
         endPts.textContent = gameScore - totalNoFinish;
-        
-        const weightedColor = `hsl(${avgH}, ${avgS}%, ${avgL}%)`;
+
+        const weightedColor = `rgb(${avgR}, ${avgG}, ${avgB})`;
         document.getElementById('yourcolor').style.background = weightedColor;
         const colNameText = document.getElementById('colorname');
-        colNameText.textContent = NameYourColor(avgH, avgS, avgL);
+        const [h, s, l] = RGBtoHSL(avgR, avgG, avgB);
+        colNameText.textContent = NameYourColor(h, s, l);
         colNameText.style.color = weightedColor;
         resultsBtn.disabled = false;
         toggleModalScore();
