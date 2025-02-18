@@ -123,7 +123,7 @@
     const WireColors = ['250, 115, 20', '250, 200, 20', '130, 200, 20', '5, 120, 85', '65, 55, 200', '160, 30, 175', '190, 20, 60'];
     const hexWires = ['#FA7314','#FAC814','#82C814','#057855', '#4137C8', '#A01EAF', '#BE143C'];
     const now = new Date();
-    const datenums = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+    const datenums = now.getFullYear() + (now.getMonth() + 1) * 10000 + now.getDate() * 1000000; //e.g. 2025-08-13 = 13082025
 
     const how = document.getElementById('instructionModal');
     const howClose = document.getElementById('okay');
@@ -267,7 +267,7 @@
         Module._addValue(val, startx, starty);
         updateNode(val, StartNode);
         Module._setColor(startx, starty, colorIndex);
-        nextColor = chooseRandomColorIndex(startx);
+        nextColor = chooseRandomColorIndex(startx + 1);
         updateNextCol(startx+1, Module);
         createConnections(startx, starty, val, StartNode, WireColors[colorIndex]);
         colorIndex = nextColor;
@@ -356,8 +356,8 @@
       return datenums + col * 12357;
     }
     function seededRandomly(seed) {
-      let x = Math.sin(seed) * 10000;
-      return x - Math.floor(x); // (0-1)
+      seed = (seed * 1664525 + 1013904223) % 4294967296; //LCG
+      return (seed >>> 0) / 4294967296; //(0,1)
     }
     function createStartValues() 
     {
@@ -387,7 +387,8 @@
     function chooseRandomColorIndex(col)
     {
       counttillnext++;
-      const indexing = Math.floor(seededRandomly(getSeed(col * counttillnext)) * WireColors.length);
+      const seed = getSeed(col * counttillnext);
+      const indexing = Math.floor(seededRandomly(seed) * WireColors.length);
       nodeGridElement.style.borderColor = hexWires[indexing];
       displayNumberElement.style.color = `rgb(${WireColors[indexing]})`;
       howClose.style.backgroundColor = hexWires[indexing];
@@ -452,11 +453,11 @@
           return;
         }
         RNGset = rngSetByRange(col, maxPower);
-        nextColor = chooseRandomColorIndex(col - 1);
+        nextColor = chooseRandomColorIndex(col);
         resetRecommendations(null, null);
         recommendMatches(col);
       } else {
-        nextColor = chooseRandomColorIndex(col - 1);
+        nextColor = chooseRandomColorIndex(col);
       }
     }
     function generateCircles() {
